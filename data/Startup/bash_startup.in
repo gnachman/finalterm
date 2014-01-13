@@ -1,24 +1,20 @@
 #!/bin/bash
 
-# Include default startup file so that user's settings are respected
-source ~/.bashrc
-
-
-
 # Final Term's customizations start here
 
-source @PKGDATADIR@/Startup/preexec.bash
+PKGDATADIR=/Users/gnachman/finalterm/data
+source $PKGDATADIR/Startup/preexec.bash
 
 
 # NOTE: xterm properly ignores sequences of this type as unknown,
 #       while some other terminals (such as GNOME Terminal) print them
 function final_term_control_sequence() {
-	control_sequence="\e]133;"
+	control_sequence="]133;"
 	for argument in "$@"; do
 		control_sequence="$control_sequence$argument;"
 	done
 	# TODO: Remove last semicolon
-	control_sequence="$control_sequence\a"
+	control_sequence="$control_sequence"
 
 	# TODO: Should "-ne" be added here?
 	echo "$control_sequence"
@@ -65,7 +61,7 @@ function send_commands() {
 	send_control_sequence "$(final_term_control_sequence 'H' "$1" '#' "${@:2}")"
 }
 
-pushd "@PKGDATADIR@/TerminalCommands" > /dev/null
+pushd "$PKGDATADIR/TerminalCommands" > /dev/null
 while IFS= read -r line; do
 	stripped_line=$(trim "$line")
 
@@ -112,17 +108,17 @@ export -f send_progress
 
 function run_termlet() {
 	if [ -t 1 ]; then
-		"@PKGDATADIR@/Termlets/$@"
+		"$PKGDATADIR/Termlets/$@"
 	else
 		"$@"
 	fi
 }
 
 # Set up termlet aliases
-pushd "@PKGDATADIR@/Termlets" > /dev/null
-for filename in *; do
-	alias $filename="run_termlet '$filename'"
-done
-popd > /dev/null
+#pushd "$PKGDATADIR/Termlets" > /dev/null
+#for filename in *; do
+#	alias $filename="run_termlet '$filename'"
+#done
+#popd > /dev/null
 
 cd ~
